@@ -1,6 +1,7 @@
 import os
 import config
-import requests 
+import requests
+import re
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -51,4 +52,29 @@ def scrap_offre_alimentaire_paca():
                 {responsable};{mail};{site};{type_entreprise};{activites}")
     return liste_data
 
-
+def scrap_rungisinternational():
+    liste_data = ["nom entreprise;adresse;tel;mail;site web"]
+    html = open("html_dir/rungisinternational.html","r")
+    content = html.read()
+    parser = BeautifulSoup(content, 'html.parser')
+    body = parser.body
+    grid = body.find_all("section",{"class":"grid-3 item"})
+    for entreprise in grid:
+        nom = entreprise.section.h1.text.strip()
+        adresse = entreprise.find("section",{"class":"address"}).text.strip()
+        tel = ""
+        try:
+            tel = entreprise.find("section",{"class":"tel"}).find("span",{"class":"tel"}).text.strip()
+        except:
+            pass
+        mail_full = entreprise.find("span",{"class":"mail"})
+        mail = ""
+        if hasattr(mail_full,'a'):
+            mail = mail_full.a['href']
+            mail = mail.split(":")[1].strip()
+        site_full = entreprise.find("span",{"class":"www"})
+        site_web = ""
+        if hasattr(site_full,'a'):
+            site_web = site_full.a['href'].strip()
+        liste_data.append(f"{nom};{adresse};{tel};{mail};{site_web}")
+    return liste_data
