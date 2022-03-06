@@ -1,0 +1,13 @@
+image: python:latest
+
+stages:
+  - test
+
+before_script:
+  - pip install -r requirements.txt
+
+test:
+  stage: test
+  script:
+    - python main.py
+
